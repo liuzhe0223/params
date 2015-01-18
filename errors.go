@@ -1,4 +1,4 @@
-package binding
+package params
 
 type (
 	// Errors may be generated during deserialization, binding,

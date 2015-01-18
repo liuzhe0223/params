@@ -1,4 +1,4 @@
-package binding
+package params
 
 import (
 	"fmt"
@@ -99,6 +99,13 @@ var jsonTestCases = []jsonTestCase{
 		payload:             `[{"title": "First Post"}, {"title": "Second Post"}]`,
 		contentType:         jsonContentType,
 		expected:            []Post{Post{Title: "First Post"}, Post{Title: "Second Post"}},
+	},
+	{
+		description:         "Slice of zore",
+		shouldSucceedOnJson: false,
+		payload:             `[]`,
+		contentType:         jsonContentType,
+		expected:            []Post{},
 	},
 }
 

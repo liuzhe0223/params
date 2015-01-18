@@ -1,4 +1,4 @@
-package binding
+package params
 
 import (
 	"io/ioutil"

@@ -1,8 +1,8 @@
-# binding [![wercker status](https://app.wercker.com/status/f00480949f8a4e4130557f802c5b5b6b "wercker status")](https://app.wercker.com/project/bykey/f00480949f8a4e4130557f802c5b5b6b)
+# params
 
 Request data binding and validation for Martini.
 
-[![GoDoc](https://godoc.org/github.com/martini-contrib/binding?status.svg)](https://godoc.org/github.com/martini-contrib/binding)
+[![GoDoc](https://godoc.org/github.com/liuzhe0223/params?status.svg)](https://godoc.org/github.com/liuzhe0223/params)
 
 ## Features
 
@@ -191,6 +191,7 @@ Bug fixes will be accepted any time as pull requests, as long as tests assert co
 
  - [Matthew Holt](https://github.com/mholt)
  - [Jeremy Saenz](https://github.com/codegangsta)
+ - [liuzhe](https://github.com/liuzhe0223)
 
 
 #### Thanks to all [contributors](https://github.com/martini-contrib/binding/graphs/contributors)!

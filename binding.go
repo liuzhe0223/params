@@ -1,7 +1,7 @@
 // Package binding transforms a raw request into a struct
 // ready to be used your application. It can also perform
 // validation on the data and handle errors.
-package binding
+package params
 
 import (
 	"encoding/json"
@@ -35,13 +35,14 @@ func Bind(obj interface{}, ifacePtr ...interface{}) martini.Handler {
 	return func(context martini.Context, req *http.Request) {
 		contentType := req.Header.Get("Content-Type")
 
+		var err error
 		if req.Method == "POST" || req.Method == "PUT" || contentType != "" {
 			if strings.Contains(contentType, "form-urlencoded") {
-				context.Invoke(Form(obj, ifacePtr...))
+				_, err = context.Invoke(Form(obj, ifacePtr...))
 			} else if strings.Contains(contentType, "multipart/form-data") {
-				context.Invoke(MultipartForm(obj, ifacePtr...))
+				_, err = context.Invoke(MultipartForm(obj, ifacePtr...))
 			} else if strings.Contains(contentType, "json") {
-				context.Invoke(Json(obj, ifacePtr...))
+				_, err = context.Invoke(Json(obj, ifacePtr...))
 			} else {
 				var errors Errors
 				if contentType == "" {
@@ -52,10 +53,17 @@ func Bind(obj interface{}, ifacePtr ...interface{}) martini.Handler {
 				context.Map(errors)
 			}
 		} else {
-			context.Invoke(Form(obj, ifacePtr...))
+			_, err = context.Invoke(Form(obj, ifacePtr...))
 		}
 
-		context.Invoke(ErrorHandler)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = context.Invoke(ErrorHandler)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -69,7 +77,7 @@ func Bind(obj interface{}, ifacePtr ...interface{}) martini.Handler {
 // An interface pointer can be added as a second argument in order
 // to map the struct to a specific interface.
 func Form(formStruct interface{}, ifacePtr ...interface{}) martini.Handler {
-	return func(context martini.Context, req *http.Request) {
+	return func(context martini.Context, req *http.Request, params martini.Params) {
 		var errors Errors
 
 		ensureNotPointer(formStruct)
@@ -83,7 +91,10 @@ func Form(formStruct interface{}, ifacePtr ...interface{}) martini.Handler {
 		if parseErr != nil {
 			errors.Add([]string{}, DeserializationError, parseErr.Error())
 		}
-		mapForm(formStruct, req.Form, nil, errors)
+
+		allParamsVlaues := mergeParams(params, req.Form)
+
+		mapForm(formStruct, allParamsVlaues, nil, errors)
 		validateAndMap(formStruct, context, errors, ifacePtr...)
 	}
 }
@@ -93,7 +104,7 @@ func Form(formStruct interface{}, ifacePtr ...interface{}) martini.Handler {
 // you can pass in an interface to make the interface available for injection
 // into other handlers later.
 func MultipartForm(formStruct interface{}, ifacePtr ...interface{}) martini.Handler {
-	return func(context martini.Context, req *http.Request) {
+	return func(context martini.Context, req *http.Request, params martini.Params) {
 		var errors Errors
 
 		ensureNotPointer(formStruct)
@@ -115,7 +126,9 @@ func MultipartForm(formStruct interface{}, ifacePtr ...interface{}) martini.Hand
 			}
 		}
 
-		mapForm(formStruct, req.MultipartForm.Value, req.MultipartForm.File, errors)
+		allParamsVlaues := mergeParams(params, req.MultipartForm.Value, req.Form)
+
+		mapForm(formStruct, allParamsVlaues, req.MultipartForm.File, errors)
 		validateAndMap(formStruct, context, errors, ifacePtr...)
 	}
 
@@ -127,12 +140,13 @@ func MultipartForm(formStruct interface{}, ifacePtr ...interface{}) martini.Hand
 // An interface pointer can be added as a second argument in order
 // to map the struct to a specific interface.
 func Json(jsonStruct interface{}, ifacePtr ...interface{}) martini.Handler {
-	return func(context martini.Context, req *http.Request) {
+	return func(context martini.Context, req *http.Request, params martini.Params) {
 		var errors Errors
 
 		ensureNotPointer(jsonStruct)
 
-		jsonStruct := reflect.New(reflect.TypeOf(jsonStruct))
+		jsonStructTyp := reflect.TypeOf(jsonStruct)
+		jsonStruct := reflect.New(jsonStructTyp)
 
 		if req.Body != nil {
 			defer req.Body.Close()
@@ -142,8 +156,47 @@ func Json(jsonStruct interface{}, ifacePtr ...interface{}) martini.Handler {
 			}
 		}
 
+		allParamsVlaues := mergeParams(params, req.Form)
+
+		jsonStructKind := jsonStructTyp.Kind()
+		if jsonStructKind == reflect.Struct {
+			mapForm(jsonStruct, allParamsVlaues, nil, errors)
+
+		} else if jsonStructKind == reflect.Slice {
+			jsonStrcutElem := jsonStruct.Elem()
+			if jsonStrcutElem.Len() == 0 {
+				errors.Add([]string{}, DeserializationError, "Slice of zero is not allowed.")
+			} else {
+				mapForm(jsonStruct.Elem().Index(0), allParamsVlaues, nil, errors)
+			}
+		}
+
 		validateAndMap(jsonStruct, context, errors, ifacePtr...)
 	}
+}
+
+func mergeParams(params map[string]string, paramsValuesList ...map[string][]string) (
+	values map[string][]string) {
+
+	values = map[string][]string{}
+
+	if len(paramsValuesList) > 0 {
+		for _, paramsValues := range paramsValuesList {
+			for k, v := range paramsValues {
+				if _, ok := values[k]; ok {
+					values[k] = append(values[k], v...)
+					continue
+				}
+				values[k] = v
+			}
+		}
+	}
+
+	for k, v := range params {
+		values[k] = []string{v}
+	}
+
+	return
 }
 
 // Validate is middleware to enforce required fields. If the struct
