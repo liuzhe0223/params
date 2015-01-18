@@ -3,6 +3,7 @@
 Request data binding and validation for Martini.
 
 [![GoDoc](https://godoc.org/github.com/liuzhe0223/params?status.svg)](https://godoc.org/github.com/liuzhe0223/params)
+[![Build Status](https://travis-ci.org/liuzhe0223/params.png?branch=master)](https://travis-ci.org/liuzhe0223/params)
 
 ## Features
 
