@@ -25,9 +25,9 @@ Suppose you have a contact form on your site where at least name and message are
 
 ```go
 type ContactForm struct {
-	Name    string `form:"name" binding:"required"`
-	Email   string `form:"email"`
-	Message string `form:"message" binding:"required"`
+	Name    string `params:"name" binding:"required"`
+	Email   string `params:"email"`
+	Message string `params:"message" binding:"required"`
 }
 ```
 
@@ -47,7 +47,7 @@ That's it! The `binding.Bind` function takes care of validating required fields.
 
 #### Getting JSON data from a request
 
-To get data from JSON payloads, simply use the `json:` struct tags instead of `form:`. Pro Tip: Use [JSON-to-Go](http://mholt.github.io/json-to-go/) to correctly convert JSON to a Go type definition. It's useful if you're new to this or the structure is large/complex.
+To get data from JSON payloads, simply use the `json:` struct tags instead of `params:`. Pro Tip: Use [JSON-to-Go](http://mholt.github.io/json-to-go/) to correctly convert JSON to a Go type definition. It's useful if you're new to this or the structure is large/complex.
 
 
 
@@ -129,8 +129,8 @@ Again, like `binding.Form`, no error handling is performed, but you can get the 
 
 ```go
 type UploadForm struct {
-	Title      string                `form:"title"`
-	TextUpload *multipart.FileHeader `form:"txtUpload"`
+	Title      string                `params:"title"`
+	TextUpload *multipart.FileHeader `params:"txtUpload"`
 }
 
 func main() {

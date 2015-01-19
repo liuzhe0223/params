@@ -14,14 +14,14 @@ type (
 
 	// For basic test cases with a required field
 	Post struct {
-		Title   string `form:"title" json:"title" binding:"required"`
-		Content string `form:"content" json:"content"`
+		Title   string `params:"title" json:"title" binding:"required"`
+		Content string `params:"content" json:"content"`
 	}
 
 	// To be used as a nested struct (with a required field)
 	Person struct {
-		Name  string `form:"name" json:"name" binding:"required"`
-		Email string `form:"email" json:"email"`
+		Name  string `params:"name" json:"name" binding:"required"`
+		Email string `params:"email" json:"email"`
 	}
 
 	// For advanced test cases: multiple values, embedded
@@ -29,14 +29,14 @@ type (
 	// and multiple file uploads
 	BlogPost struct {
 		Post
-		Id          int                     `form:"id" binding:"required"` // JSON not specified here for test coverage
-		Ignored     string                  `form:"-" json:"-"`
-		Ratings     []int                   `form:"rating" json:"ratings"`
+		Id          int                     `params:"id" binding:"required"` // JSON not specified here for test coverage
+		Ignored     string                  `params:"-" json:"-"`
+		Ratings     []int                   `params:"rating" json:"ratings"`
 		Author      Person                  `json:"author"`
 		Coauthor    *Person                 `json:"coauthor"`
-		HeaderImage *multipart.FileHeader   `form:"headerImage"`
-		Pictures    []*multipart.FileHeader `form:"picture"`
-		unexported  string                  `form:"unexported"`
+		HeaderImage *multipart.FileHeader   `params:"headerImage"`
+		Pictures    []*multipart.FileHeader `params:"picture"`
+		unexported  string                  `params:"unexported"`
 	}
 
 	EmbedPerson struct {

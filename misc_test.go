@@ -88,21 +88,21 @@ func TestEnsureNotPointer(t *testing.T) {
 
 // Used in testing setWithProperType; kind of clunky...
 type Everything struct {
-	Integer    int     `form:"integer"`
-	Integer8   int8    `form:"integer8"`
-	Integer16  int16   `form:"integer16"`
-	Integer32  int32   `form:"integer32"`
-	Integer64  int64   `form:"integer64"`
-	Uinteger   uint    `form:"uinteger"`
-	Uinteger8  uint8   `form:"uinteger8"`
-	Uinteger16 uint16  `form:"uinteger16"`
-	Uinteger32 uint32  `form:"uinteger32"`
-	Uinteger64 uint64  `form:"uinteger64"`
-	Boolean_1  bool    `form:"boolean_1"`
-	Boolean_2  bool    `form:"boolean_2"`
-	Fl32_1     float32 `form:"fl32_1"`
-	Fl32_2     float32 `form:"fl32_2"`
-	Fl64_1     float64 `form:"fl64_1"`
-	Fl64_2     float64 `form:"fl64_2"`
-	Str        string  `form:"str"`
+	Integer    int     `params:"integer"`
+	Integer8   int8    `params:"integer8"`
+	Integer16  int16   `params:"integer16"`
+	Integer32  int32   `params:"integer32"`
+	Integer64  int64   `params:"integer64"`
+	Uinteger   uint    `params:"uinteger"`
+	Uinteger8  uint8   `params:"uinteger8"`
+	Uinteger16 uint16  `params:"uinteger16"`
+	Uinteger32 uint32  `params:"uinteger32"`
+	Uinteger64 uint64  `params:"uinteger64"`
+	Boolean_1  bool    `params:"boolean_1"`
+	Boolean_2  bool    `params:"boolean_2"`
+	Fl32_1     float32 `params:"fl32_1"`
+	Fl32_2     float32 `params:"fl32_2"`
+	Fl64_1     float64 `params:"fl64_1"`
+	Fl64_2     float64 `params:"fl64_2"`
+	Str        string  `params:"str"`
 }
