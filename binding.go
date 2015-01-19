@@ -253,7 +253,7 @@ func validateStruct(errors Errors, obj interface{}) Errors {
 		field := typ.Field(i)
 
 		// Skip ignored and unexported fields in the struct
-		if field.Tag.Get("form") == "-" || !val.Field(i).CanInterface() {
+		if field.Tag.Get("params") == "-" || !val.Field(i).CanInterface() {
 			continue
 		}
 
@@ -272,7 +272,7 @@ func validateStruct(errors Errors, obj interface{}) Errors {
 				name := field.Name
 				if j := field.Tag.Get("json"); j != "" {
 					name = j
-				} else if f := field.Tag.Get("form"); f != "" {
+				} else if f := field.Tag.Get("params"); f != "" {
 					name = f
 				}
 				errors.Add([]string{name}, RequiredError, "Required")
@@ -303,7 +303,7 @@ func mapForm(formStruct reflect.Value, form map[string][]string,
 			}
 		} else if typeField.Type.Kind() == reflect.Struct {
 			mapForm(structField, form, formfile, errors)
-		} else if inputFieldName := typeField.Tag.Get("form"); inputFieldName != "" {
+		} else if inputFieldName := typeField.Tag.Get("params"); inputFieldName != "" {
 			if !structField.CanSet() {
 				continue
 			}
